@@ -100,10 +100,10 @@ public final class OriginalConfPretreatmentUtil {
         } else {
             boolean isPreCheck = originalConfig.getBool(Key.DRYRUN, false);
             List<String> allColumns;
-            if (isPreCheck){
-                allColumns = DBUtil.getTableColumnsByConn(DATABASE_TYPE,connectionFactory.getConnecttionWithoutRetry(), oneTable, connectionFactory.getConnectionInfo());
-            }else{
-                allColumns = DBUtil.getTableColumnsByConn(DATABASE_TYPE,connectionFactory.getConnecttion(), oneTable, connectionFactory.getConnectionInfo());
+            if (isPreCheck) {
+                allColumns = DBUtil.getTableColumnsByConn(DATABASE_TYPE, connectionFactory.getConnecttionWithoutRetry(), oneTable, connectionFactory.getConnectionInfo());
+            } else {
+                allColumns = DBUtil.getTableColumnsByConn(DATABASE_TYPE, connectionFactory.getConnecttion(), oneTable, connectionFactory.getConnectionInfo());
             }
 
             LOG.info("table:[{}] all columns:[\n{}\n].", oneTable,
@@ -125,7 +125,7 @@ public final class OriginalConfPretreatmentUtil {
                 try {
                     connection = connectionFactory.getConnecttion();
                     // 检查列是否都为数据库表中正确的列（通过执行一次 select column from table 进行判断）
-                    DBUtil.getColumnMetaData(connection, oneTable,StringUtils.join(userConfiguredColumns, ","));
+                    DBUtil.getColumnMetaData(connection, oneTable, StringUtils.join(userConfiguredColumns, ","));
                 } finally {
                     DBUtil.closeDBResources(null, connection);
                 }
@@ -158,7 +158,12 @@ public final class OriginalConfPretreatmentUtil {
 
         List<String> valueHolders = new ArrayList<String>(columns.size());
         for (int i = 0; i < columns.size(); i++) {
-            valueHolders.add("?");
+            if (DATABASE_TYPE == DataBaseType.Oracle && columns.get(i).equalsIgnoreCase("shape")) {
+                String valueHolder = "SDE.ST_GEOMETRY(?,4549)";
+                valueHolders.add(valueHolder);
+            } else {
+                valueHolders.add("?");
+            }
         }
 
         boolean forceUseUpdate = false;
@@ -167,7 +172,7 @@ public final class OriginalConfPretreatmentUtil {
             forceUseUpdate = true;
         }
 
-        String writeDataSqlTemplate = WriterUtil.getWriteTemplate(columns, valueHolders, writeMode,dataBaseType, forceUseUpdate);
+        String writeDataSqlTemplate = WriterUtil.getWriteTemplate(columns, valueHolders, writeMode, dataBaseType, forceUseUpdate);
 
         LOG.info("Write data [\n{}\n], which jdbcUrl like:[{}]", writeDataSqlTemplate, jdbcUrl);
 

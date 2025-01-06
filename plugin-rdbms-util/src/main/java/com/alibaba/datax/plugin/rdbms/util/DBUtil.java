@@ -82,9 +82,9 @@ public final class DBUtil {
     }
 
     public static String chooseJdbcUrlWithoutRetry(final DataBaseType dataBaseType,
-                                       final List<String> jdbcUrls, final String username,
-                                       final String password, final List<String> preSql,
-                                       final boolean checkSlave) throws DataXException {
+                                                   final List<String> jdbcUrls, final String username,
+                                                   final String password, final List<String> preSql,
+                                                   final boolean checkSlave) throws DataXException {
 
         if (null == jdbcUrls || jdbcUrls.isEmpty()) {
             throw DataXException.asDataXException(
@@ -567,10 +567,18 @@ public final class DBUtil {
             ResultSetMetaData rsMetaData = rs.getMetaData();
             for (int i = 0, len = rsMetaData.getColumnCount(); i < len; i++) {
 
-                columnMetaData.getLeft().add(rsMetaData.getColumnName(i + 1));
-                columnMetaData.getMiddle().add(rsMetaData.getColumnType(i + 1));
-                columnMetaData.getRight().add(
-                        rsMetaData.getColumnTypeName(i + 1));
+                String columnName = rsMetaData.getColumnName(i + 1);
+                int columnType = rsMetaData.getColumnType(i + 1);
+                String columnTypeName = rsMetaData.getColumnTypeName(i + 1);
+
+                columnMetaData.getLeft().add(columnName);
+                if ("SDE.ST_GEOMETRY".equalsIgnoreCase(columnTypeName)) {
+                    columnMetaData.getMiddle().add(Types.VARCHAR);
+                    columnMetaData.getRight().add("VARCHAR");
+                } else {
+                    columnMetaData.getMiddle().add(columnType);
+                    columnMetaData.getRight().add(columnTypeName);
+                }
             }
             return columnMetaData;
 
@@ -787,7 +795,7 @@ public final class DBUtil {
                     DBUtilErrorCode.RS_ASYNC_ERROR, "异步获取ResultSet失败", e);
         }
     }
-    
+
     public static void loadDriverClass(String pluginType, String pluginName) {
         try {
             String pluginJsonPath = StringUtils.join(
