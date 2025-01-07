@@ -573,7 +573,7 @@ public final class DBUtil {
                 columnMetaData.getLeft().add(columnName);
 
                 // 判断包含[ST_GEOMETRY]即可
-                if (columnTypeName.contains("ST_GEOMETRY")) {
+                if (columnTypeName.contains(Constant.GEOMETRY_TYPE_FLAG)) {
                     columnMetaData.getMiddle().add(Types.VARCHAR);
                     columnMetaData.getRight().add("VARCHAR");
                 } else {

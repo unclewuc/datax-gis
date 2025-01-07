@@ -15,12 +15,15 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.Statement;
-import java.util.*;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public final class WriterUtil {
     private static final Logger LOG = LoggerFactory.getLogger(WriterUtil.class);
 
-    //TODO 切分报错
+    // TODO 切分报错
     public static List<Configuration> doSplit(Configuration simplifiedConf,
                                               int adviceNumber) {
 
@@ -28,9 +31,9 @@ public final class WriterUtil {
 
         int tableNumber = simplifiedConf.getInt(Constant.TABLE_NUMBER_MARK);
 
-        //处理单表的情况
+        // 处理单表的情况
         if (tableNumber == 1) {
-            //由于在之前的  master prepare 中已经把 table,jdbcUrl 提取出来，所以这里处理十分简单
+            // 由于在之前的  master prepare 中已经把 table,jdbcUrl 提取出来，所以这里处理十分简单
             for (int j = 0; j < adviceNumber; j++) {
                 splitResultConfigs.add(simplifiedConf.clone());
             }
@@ -83,7 +86,7 @@ public final class WriterUtil {
 
         List<String> renderedSqls = new ArrayList<String>();
         for (String sql : preOrPostSqls) {
-            //preSql为空时，不加入执行队列
+            // preSql为空时，不加入执行队列
             if (StringUtils.isNotBlank(sql)) {
                 renderedSqls.add(sql.replace(Constant.TABLE_NAME_PLACEHOLDER, tableName));
             }
@@ -92,7 +95,7 @@ public final class WriterUtil {
         return renderedSqls;
     }
 
-    public static void executeSqls(Connection conn, List<String> sqls, String basicMessage,DataBaseType dataBaseType) {
+    public static void executeSqls(Connection conn, List<String> sqls, String basicMessage, DataBaseType dataBaseType) {
         Statement stmt = null;
         String currentSql = null;
         try {
@@ -102,7 +105,7 @@ public final class WriterUtil {
                 DBUtil.executeSqlWithoutResultSet(stmt, sql);
             }
         } catch (Exception e) {
-            throw RdbmsException.asQueryException(dataBaseType,e,currentSql,null,null);
+            throw RdbmsException.asQueryException(dataBaseType, e, currentSql, null, null);
         } finally {
             DBUtil.closeDBResources(null, stmt, null);
         }
@@ -121,8 +124,8 @@ public final class WriterUtil {
         String writeDataSqlTemplate;
         if (forceUseUpdate ||
                 ((dataBaseType == DataBaseType.MySql || dataBaseType == DataBaseType.Tddl) && writeMode.trim().toLowerCase().startsWith("update"))
-                ) {
-            //update只在mysql下使用
+        ) {
+            // update只在mysql下使用
 
             writeDataSqlTemplate = new StringBuilder()
                     .append("INSERT INTO %s (").append(StringUtils.join(columnHolders, ","))
@@ -132,7 +135,7 @@ public final class WriterUtil {
                     .toString();
         } else {
 
-            //这里是保护,如果其他错误的使用了update,需要更换为replace
+            // 这里是保护,如果其他错误的使用了update,需要更换为replace
             if (writeMode.trim().toLowerCase().startsWith("update")) {
                 writeMode = "replace";
             }
@@ -145,17 +148,17 @@ public final class WriterUtil {
         return writeDataSqlTemplate;
     }
 
-    public static String onDuplicateKeyUpdateString(List<String> columnHolders){
+    public static String onDuplicateKeyUpdateString(List<String> columnHolders) {
         if (columnHolders == null || columnHolders.size() < 1) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
         sb.append(" ON DUPLICATE KEY UPDATE ");
         boolean first = true;
-        for(String column:columnHolders){
-            if(!first){
+        for (String column : columnHolders) {
+            if (!first) {
                 sb.append(",");
-            }else{
+            } else {
                 first = false;
             }
             sb.append(column);
@@ -180,11 +183,11 @@ public final class WriterUtil {
         if (null != renderedPreSqls && !renderedPreSqls.isEmpty()) {
             LOG.info("Begin to preCheck preSqls:[{}].",
                     StringUtils.join(renderedPreSqls, ";"));
-            for(String sql : renderedPreSqls) {
-                try{
+            for (String sql : renderedPreSqls) {
+                try {
                     DBUtil.sqlValid(sql, type);
-                }catch(ParserException e) {
-                    throw RdbmsException.asPreSQLParserException(type,e,sql);
+                } catch (ParserException e) {
+                    throw RdbmsException.asPreSQLParserException(type, e, sql);
                 }
             }
         }
@@ -203,14 +206,47 @@ public final class WriterUtil {
 
             LOG.info("Begin to preCheck postSqls:[{}].",
                     StringUtils.join(renderedPostSqls, ";"));
-            for(String sql : renderedPostSqls) {
-                try{
+            for (String sql : renderedPostSqls) {
+                try {
                     DBUtil.sqlValid(sql, type);
-                }catch(ParserException e){
-                    throw RdbmsException.asPostSQLParserException(type,e,sql);
+                } catch (ParserException e) {
+                    throw RdbmsException.asPostSQLParserException(type, e, sql);
                 }
 
             }
         }
+    }
+
+    /**
+     * 获取gis数据默认数据库处理方法名
+     *
+     * @param dataBaseType 数据库类型
+     * @return
+     */
+    public static String getDefaultGisDataMethodName(DataBaseType dataBaseType) {
+        switch (dataBaseType) {
+            case Oracle:
+                return "SDE.ST_GEOMETRY";
+            case PostgreSQL:
+            case KingbaseES:
+                return "ST_GEOMETRY";
+            default:
+                return "ST_GEOMETRY";
+        }
+    }
+
+    /**
+     * 获取shape列处理字符串
+     *
+     * @param methodName  处理方法
+     * @param valueHolder 占位符，默认为英文?
+     * @param wkid        坐标系
+     * @return
+     */
+    public static String getGeometryFieldHandleString(String methodName, String valueHolder, int wkid) {
+        String holder = StringUtils.isBlank(valueHolder) ? "?" : valueHolder;
+        if (StringUtils.isBlank(methodName)) return holder;
+        String handleString = MessageFormat.format("{0}({1},{2})", methodName, holder, wkid);
+        return handleString;
     }
 }

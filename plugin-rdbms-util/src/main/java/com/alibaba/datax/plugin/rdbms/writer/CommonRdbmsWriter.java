@@ -200,9 +200,9 @@ public class CommonRdbmsWriter {
         protected boolean emptyAsNull;
         protected Triple<List<String>, List<Integer>, List<String>> resultSetMetaData;
 
-        // geometry：空间字段名及坐标
         protected String geometryFieldName;
         protected int wkid;
+        protected String method;
 
         private int dumpRecordLimit = Constant.DEFAULT_DUMP_RECORD_LIMIT;
         private AtomicLong dumpRecordCount = new AtomicLong(0);
@@ -247,6 +247,8 @@ public class CommonRdbmsWriter {
 
             this.geometryFieldName = writerSliceConfig.getString(Key.GEOMETRY_FIELD, "shape");
             this.wkid = writerSliceConfig.getInt(Key.WKID, 4549);
+            String defaultGisDataHandler = WriterUtil.getDefaultGisDataMethodName(this.dataBaseType);
+            this.method = writerSliceConfig.getString(Key.METHOD, defaultGisDataHandler);
 
             BASIC_MESSAGE = String.format("jdbcUrl:[%s], table:[%s]",
                     this.jdbcUrl, this.table);
@@ -585,8 +587,8 @@ public class CommonRdbmsWriter {
         }
 
         protected String calcValueHolder(String columnType) {
-            if (this.dataBaseType == DataBaseType.Oracle && columnType.equalsIgnoreCase("SDE.ST_GEOMETRY")) {
-                return "SDE.ST_GEOMETRY(" + VALUE_HOLDER + "," + this.wkid + ")";
+            if (this.dataBaseType == DataBaseType.Oracle && columnType.equalsIgnoreCase(Constant.ORACLE_SHAPE_FIELD_TYPE)) {
+                return WriterUtil.getGeometryFieldHandleString(this.method, VALUE_HOLDER, this.wkid);
             }
             return VALUE_HOLDER;
         }

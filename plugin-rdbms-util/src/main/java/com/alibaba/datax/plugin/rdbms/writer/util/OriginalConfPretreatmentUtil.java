@@ -155,14 +155,16 @@ public final class OriginalConfPretreatmentUtil {
 
         // 默认为：insert 方式
         String writeMode = originalConfig.getString(Key.WRITE_MODE, "INSERT");
-        // geometry：空间字段名及坐标
+
         String geometryFieldName = originalConfig.getString(Key.GEOMETRY_FIELD, "shape");
         int wkid = originalConfig.getInt(Key.WKID, 4549);
+        String defaultGisDataHandler = WriterUtil.getDefaultGisDataMethodName(DATABASE_TYPE);
+        String method = originalConfig.getString(Key.METHOD, defaultGisDataHandler);
 
         List<String> valueHolders = new ArrayList<String>(columns.size());
         for (int i = 0; i < columns.size(); i++) {
             if (DATABASE_TYPE == DataBaseType.Oracle && columns.get(i).equalsIgnoreCase(geometryFieldName)) {
-                String valueHolder = "SDE.ST_GEOMETRY(?," + wkid + ")";
+                String valueHolder = WriterUtil.getGeometryFieldHandleString(method, "?", wkid);
                 valueHolders.add(valueHolder);
             } else {
                 valueHolders.add("?");
