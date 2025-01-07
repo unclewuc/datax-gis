@@ -200,6 +200,10 @@ public class CommonRdbmsWriter {
         protected boolean emptyAsNull;
         protected Triple<List<String>, List<Integer>, List<String>> resultSetMetaData;
 
+        // geometry：空间字段名及坐标
+        protected String geometryFieldName;
+        protected int wkid;
+
         private int dumpRecordLimit = Constant.DEFAULT_DUMP_RECORD_LIMIT;
         private AtomicLong dumpRecordCount = new AtomicLong(0);
 
@@ -212,7 +216,7 @@ public class CommonRdbmsWriter {
             this.password = writerSliceConfig.getString(Key.PASSWORD);
             this.jdbcUrl = writerSliceConfig.getString(Key.JDBC_URL);
 
-            //ob10的处理
+            // ob10的处理
             if (this.jdbcUrl.startsWith(Constant.OB10_SPLIT_STRING)) {
                 String[] ss = this.jdbcUrl.split(Constant.OB10_SPLIT_STRING_PATTERN);
                 if (ss.length != 3) {
@@ -240,6 +244,9 @@ public class CommonRdbmsWriter {
             emptyAsNull = writerSliceConfig.getBool(Key.EMPTY_AS_NULL, true);
             INSERT_OR_REPLACE_TEMPLATE = writerSliceConfig.getString(Constant.INSERT_OR_REPLACE_TEMPLATE_MARK);
             this.writeRecordSql = String.format(INSERT_OR_REPLACE_TEMPLATE, this.table);
+
+            this.geometryFieldName = writerSliceConfig.getString(Key.GEOMETRY_FIELD, "shape");
+            this.wkid = writerSliceConfig.getInt(Key.WKID, 4549);
 
             BASIC_MESSAGE = String.format("jdbcUrl:[%s], table:[%s]",
                     this.jdbcUrl, this.table);
@@ -452,7 +459,7 @@ public class CommonRdbmsWriter {
                     }
                     break;
 
-                //tinyint is a little special in some database like mysql {boolean->tinyint(1)}
+                // tinyint is a little special in some database like mysql {boolean->tinyint(1)}
                 case Types.TINYINT:
                     Long longValue = column.asLong();
                     if (null == longValue) {
@@ -567,7 +574,7 @@ public class CommonRdbmsWriter {
                 }
 
                 boolean forceUseUpdate = false;
-                //ob10的处理
+                // ob10的处理
                 if (dataBaseType != null && dataBaseType == DataBaseType.MySql && OriginalConfPretreatmentUtil.isOB10(jdbcUrl)) {
                     forceUseUpdate = true;
                 }
@@ -579,7 +586,7 @@ public class CommonRdbmsWriter {
 
         protected String calcValueHolder(String columnType) {
             if (this.dataBaseType == DataBaseType.Oracle && columnType.equalsIgnoreCase("SDE.ST_GEOMETRY")) {
-                return "SDE.ST_GEOMETRY(" + VALUE_HOLDER + ",4549)";
+                return "SDE.ST_GEOMETRY(" + VALUE_HOLDER + "," + this.wkid + ")";
             }
             return VALUE_HOLDER;
         }

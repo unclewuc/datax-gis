@@ -13,7 +13,7 @@ public final class Key {
 
     public final static String ONCONFLICT_COLUMN = "onConflictColumn";
 
-    //可选值为：insert,replace，默认为 insert （mysql 支持，oracle 没用 replace 机制，只能 insert,oracle 可以不暴露这个参数）
+    // 可选值为：insert,replace，默认为 insert （mysql 支持，oracle 没用 replace 机制，只能 insert,oracle 可以不暴露这个参数）
     public final static String WRITE_MODE = "writeMode";
 
     public final static String PRE_SQL = "preSql";
@@ -22,10 +22,10 @@ public final class Key {
 
     public final static String TDDL_APP_NAME = "appName";
 
-    //默认值：256
+    // 默认值：256
     public final static String BATCH_SIZE = "batchSize";
 
-    //默认值：32m
+    // 默认值：32m
     public final static String BATCH_BYTE_SIZE = "batchByteSize";
 
     public final static String EMPTY_AS_NULL = "emptyAsNull";
@@ -39,4 +39,11 @@ public final class Key {
     public final static String TABLE_RULE = "tableRule";
 
     public final static String DRYRUN = "dryRun";
+
+    // geometry
+    public final static String GEOMETRY = "geometry";
+
+    public final static String GEOMETRY_FIELD = "geoField";
+
+    public final static String WKID = "wkid";
 }

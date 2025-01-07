@@ -155,11 +155,14 @@ public final class OriginalConfPretreatmentUtil {
 
         // 默认为：insert 方式
         String writeMode = originalConfig.getString(Key.WRITE_MODE, "INSERT");
+        // geometry：空间字段名及坐标
+        String geometryFieldName = originalConfig.getString(Key.GEOMETRY_FIELD, "shape");
+        int wkid = originalConfig.getInt(Key.WKID, 4549);
 
         List<String> valueHolders = new ArrayList<String>(columns.size());
         for (int i = 0; i < columns.size(); i++) {
-            if (DATABASE_TYPE == DataBaseType.Oracle && columns.get(i).equalsIgnoreCase("shape")) {
-                String valueHolder = "SDE.ST_GEOMETRY(?,4549)";
+            if (DATABASE_TYPE == DataBaseType.Oracle && columns.get(i).equalsIgnoreCase(geometryFieldName)) {
+                String valueHolder = "SDE.ST_GEOMETRY(?," + wkid + ")";
                 valueHolders.add(valueHolder);
             } else {
                 valueHolders.add("?");
@@ -167,7 +170,7 @@ public final class OriginalConfPretreatmentUtil {
         }
 
         boolean forceUseUpdate = false;
-        //ob10的处理
+        // ob10的处理
         if (dataBaseType == DataBaseType.MySql && isOB10(jdbcUrl)) {
             forceUseUpdate = true;
         }
@@ -180,7 +183,7 @@ public final class OriginalConfPretreatmentUtil {
     }
 
     public static boolean isOB10(String jdbcUrl) {
-        //ob10的处理
+        // ob10的处理
         if (jdbcUrl.startsWith(com.alibaba.datax.plugin.rdbms.writer.Constant.OB10_SPLIT_STRING)) {
             String[] ss = jdbcUrl.split(com.alibaba.datax.plugin.rdbms.writer.Constant.OB10_SPLIT_STRING_PATTERN);
             if (ss.length != 3) {
