@@ -1,14 +1,18 @@
 {
-    "name": "oraclereader",
-    "parameter": {
-        "username": "",
-        "password": "",
-        "column": [],
-        "connection": [
-            {
-                "table": [],
-                "jdbcUrl": []
-            }
-        ]
+  "name": "oraclereader",
+  "parameter": {
+    "username": "",
+    "password": "",
+    "column": [],
+    "connection": [
+      {
+        "table": [],
+        "jdbcUrl": []
+      }
+    ],
+    "geometry": {
+      "geoField": "",
+      "method": ""
     }
+  }
 }

@@ -35,10 +35,10 @@ public final class OriginalConfPretreatmentUtil {
 
     public static void dealWhere(Configuration originalConfig) {
         String where = originalConfig.getString(Key.WHERE, null);
-        if(StringUtils.isNotBlank(where)) {
+        if (StringUtils.isNotBlank(where)) {
             String whereImprove = where.trim();
-            if(whereImprove.endsWith(";") || whereImprove.endsWith("；")) {
-                whereImprove = whereImprove.substring(0,whereImprove.length()-1);
+            if (whereImprove.endsWith(";") || whereImprove.endsWith("；")) {
+                whereImprove = whereImprove.substring(0, whereImprove.length() - 1);
             }
             originalConfig.set(Key.WHERE, whereImprove);
         }
@@ -66,7 +66,7 @@ public final class OriginalConfPretreatmentUtil {
         String password = originalConfig.getString(Key.PASSWORD);
         boolean checkSlave = originalConfig.getBool(Key.CHECK_SLAVE, false);
         boolean isTableMode = originalConfig.getBool(Constant.IS_TABLE_MODE);
-        boolean isPreCheck = originalConfig.getBool(Key.DRYRUN,false);
+        boolean isPreCheck = originalConfig.getBool(Key.DRYRUN, false);
 
         List<Object> conns = originalConfig.getList(Constant.CONN_MARK,
                 Object.class);
@@ -99,7 +99,7 @@ public final class OriginalConfPretreatmentUtil {
             originalConfig.set(String.format("%s[%d].%s", Constant.CONN_MARK,
                     i, Key.JDBC_URL), jdbcUrl);
 
-            LOG.info("Available jdbcUrl:{}.",jdbcUrl);
+            LOG.info("Available jdbcUrl:{}.", jdbcUrl);
 
             if (isTableMode) {
                 // table 方式
@@ -173,7 +173,7 @@ public final class OriginalConfPretreatmentUtil {
                         }
 
                         quotedColumns.add(column);
-                        //以下判断没有任何意义
+                        // 以下判断没有任何意义
 //                        if (null == column) {
 //                            quotedColumns.add(null);
 //                        } else {
@@ -220,7 +220,6 @@ public final class OriginalConfPretreatmentUtil {
                 originalConfig.remove(Key.SPLIT_PK);
             }
         }
-
     }
 
     private static boolean recognizeTableOrQuerySqlMode(
