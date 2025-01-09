@@ -246,7 +246,7 @@ public final class WriterUtil {
     public static String getGeometryFieldHandleString(String methodName, String valueHolder, int wkid) {
         String holder = StringUtils.isBlank(valueHolder) ? "?" : valueHolder;
         if (StringUtils.isBlank(methodName)) return holder;
-        String handleString = MessageFormat.format("{0}({1},{2})", methodName, holder, wkid);
+        String handleString = String.format("%s(%s,%s)", methodName, holder, wkid);
         return handleString;
     }
 }
