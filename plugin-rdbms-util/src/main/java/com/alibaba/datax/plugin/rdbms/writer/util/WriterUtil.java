@@ -226,12 +226,12 @@ public final class WriterUtil {
     public static String getDefaultGisDataMethodName(DataBaseType dataBaseType) {
         switch (dataBaseType) {
             case Oracle:
-                return "SDE.ST_GEOMETRY";
+                return "SDE.ST_GEOMFROMWKB";
             case PostgreSQL:
             case KingbaseES:
-                return "ST_GEOMETRY";
+                return "ST_GEOMFROMWKB";
             default:
-                return "ST_GEOMETRY";
+                return "ST_GEOMFROMWKB";
         }
     }
 

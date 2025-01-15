@@ -41,13 +41,13 @@ public final class Key {
     public final static String DRYRUN = "dryRun";
 
     // 默认值：shape
-    public final static String GEOMETRY_FIELD = "geoField";
+    public final static String GEOMETRY_FIELD = "geometry.geoField";
 
     // 默认值：4549
-    public final static String WKID = "wkid";
+    public final static String WKID = "geometry.wkid";
 
     // 数据库处理方法
-    // oracle：SDE.ST_GEOMETRY
-    // postgresql：ST_GEOMETRY
-    public final static String METHOD = "method";
+    // oracle：SDE.ST_GEOMFROMWKB
+    // postgresql：ST_GEOMFROMWKB
+    public final static String METHOD = "geometry.method";
 }
