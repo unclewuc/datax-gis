@@ -21,5 +21,5 @@ public final class Constant {
 
     public static final int DEFAULT_DUMP_RECORD_LIMIT = 10;
 
-    public static final String ORACLE_SHAPE_FIELD_TYPE = "SDE.ST_GEOMETRY";
+    public static final String SHAPE_FIELD_TYPE = "GEOMETRY";
 }

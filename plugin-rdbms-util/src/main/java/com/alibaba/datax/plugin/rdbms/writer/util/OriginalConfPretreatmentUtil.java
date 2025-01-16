@@ -163,7 +163,7 @@ public final class OriginalConfPretreatmentUtil {
 
         List<String> valueHolders = new ArrayList<String>(columns.size());
         for (int i = 0; i < columns.size(); i++) {
-            if (DATABASE_TYPE == DataBaseType.Oracle && columns.get(i).equalsIgnoreCase(geometryFieldName)) {
+            if (columns.get(i).equalsIgnoreCase(geometryFieldName)) {
                 String valueHolder = WriterUtil.getGeometryFieldHandleString(method, "?", wkid);
                 valueHolders.add(valueHolder);
             } else {

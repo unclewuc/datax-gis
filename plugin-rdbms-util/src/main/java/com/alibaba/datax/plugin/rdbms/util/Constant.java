@@ -22,5 +22,5 @@ public final class Constant {
     public static final String ORACLE_SELECT_PRI = "insufficient privileges";
     public static final String ORACLE_SQL = "invalid identifier";
 
-    public static final String GEOMETRY_TYPE_FLAG = "ST_GEOMETRY";
+    public static final String GEOMETRY_TYPE_FLAG = "GEOMETRY";
 }

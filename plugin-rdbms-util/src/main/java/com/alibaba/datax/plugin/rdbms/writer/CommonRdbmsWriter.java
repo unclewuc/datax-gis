@@ -587,7 +587,7 @@ public class CommonRdbmsWriter {
         }
 
         protected String calcValueHolder(String columnType) {
-            if (this.dataBaseType == DataBaseType.Oracle && columnType.equalsIgnoreCase(Constant.ORACLE_SHAPE_FIELD_TYPE)) {
+            if (columnType.toUpperCase().contains(Constant.SHAPE_FIELD_TYPE)) {
                 return WriterUtil.getGeometryFieldHandleString(this.method, VALUE_HOLDER, this.wkid);
             }
             return VALUE_HOLDER;
