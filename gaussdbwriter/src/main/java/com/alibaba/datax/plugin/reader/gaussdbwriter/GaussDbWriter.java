@@ -63,14 +63,14 @@ public class GaussDbWriter extends Writer {
         @Override
         public void init() {
             this.writerSliceConfig = super.getPluginJobConf();
-            this.commonRdbmsWriterSlave = new CommonRdbmsWriter.Task(DATABASE_TYPE){
+            this.commonRdbmsWriterSlave = new CommonRdbmsWriter.Task(DATABASE_TYPE) {
                 @Override
-                public String calcValueHolder(String columnType){
-                    if("serial".equalsIgnoreCase(columnType)){
+                public String calcValueHolder(String columnName, String columnType) {
+                    if ("serial".equalsIgnoreCase(columnType)) {
                         return "?::int";
-                    }else if("bigserial".equalsIgnoreCase(columnType)){
+                    } else if ("bigserial".equalsIgnoreCase(columnType)) {
                         return "?::int8";
-                    }else if("bit".equalsIgnoreCase(columnType)){
+                    } else if ("bit".equalsIgnoreCase(columnType)) {
                         return "?::bit varying";
                     }
                     return "?::" + columnType;

@@ -568,11 +568,12 @@ public class CommonRdbmsWriter {
         }
 
         private void calcWriteRecordSql() {
-            if (!VALUE_HOLDER.equals(calcValueHolder(""))) {
+            if (!VALUE_HOLDER.equals(calcValueHolder("", ""))) {
                 List<String> valueHolders = new ArrayList<String>(columnNumber);
                 for (int i = 0; i < columns.size(); i++) {
+                    String name = resultSetMetaData.getLeft().get(i);
                     String type = resultSetMetaData.getRight().get(i);
-                    valueHolders.add(calcValueHolder(type));
+                    valueHolders.add(calcValueHolder(name, type));
                 }
 
                 boolean forceUseUpdate = false;
@@ -586,7 +587,7 @@ public class CommonRdbmsWriter {
             }
         }
 
-        protected String calcValueHolder(String columnType) {
+        protected String calcValueHolder(String columnName, String columnType) {
             if (columnType.toUpperCase().contains(Constant.SHAPE_FIELD_TYPE)) {
                 return WriterUtil.getGeometryFieldHandleString(this.method, VALUE_HOLDER, this.wkid);
             }
